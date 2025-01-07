@@ -14,6 +14,44 @@ function query() {
     })
 }
 
+function totp() {
+    const totpCode = document.getElementById("totp-code").value;
+
+    payload = {
+        totp: totpCode
+    }
+    fetch("http://" + parsedUrl.host + "/totp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.status);
+        }
+        return response;
+    })
+    .then(data => {
+        if (data.status == 200) {
+            alert("TOTP successful");
+            window.location.href = ("http://" + parsedUrl.host + "/query.html");
+        }
+    })
+    .catch((err) => {
+        if (err.message == 500) {
+            alert("Server error");
+        }
+        else if (err.message == 401) {
+            alert("Incorrect TOTP");
+        }
+        else {
+            alert("Unknown Error");
+        }
+    });
+}
+
 function login() {
     const u = document.getElementById("username").value;
     const p = document.getElementById("password").value;
@@ -38,7 +76,7 @@ function login() {
     .then(data => {
         if (data.status == 200) {
             alert("Login successful!");
-            window.location.href = ("http://" + parsedUrl.host + "/query.html");
+            window.location.href = ("http://" + parsedUrl.host + "/totp.html");
         }
     })
     .catch((err) => {
