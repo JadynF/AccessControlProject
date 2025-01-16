@@ -16,6 +16,9 @@ const MYSQLPASS = String(process.env.MYSQLPASS);
 const app = express();
 app.use(express.json());
 
+
+
+
 let connection = mysql.createConnection({
   host: MYSQLHOST,
   user: MYSQLUSER,
@@ -73,6 +76,8 @@ app.post("/totp", (req, res) => {
 app.post("/login", function (req, res) {
   let username = req.body.username;
   let password = req.body.password;
+  
+  console.log('will this print? (located in backend-user index.js /login to test if its called)')
 
   let SQL = "SELECT * FROM users WHERE username='" + username + "';";
   connection.query(SQL, [true], (err, results, fields) => {

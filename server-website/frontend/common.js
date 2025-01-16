@@ -3,7 +3,7 @@ var parsedUrl = new URL(window.location.href);
 function query() {
     fetch("http://" + parsedUrl.host + "/query", {
         method: "GET",
-        mode: "no-cors",
+        mode: "cors",
     })
     .then((resp) => resp.text())
     .then((data) => {
@@ -24,6 +24,7 @@ function totp() {
     }
     fetch("http://" + parsedUrl.host + ":8001/totp", {
         method: "POST",
+        mode: "cors",
         headers: {
             "Content-Type": "application/json"
         },
@@ -60,13 +61,16 @@ function totp() {
 function login() {
     const u = document.getElementById("username").value;
     const p = document.getElementById("password").value;
-
     payload = {
         username: u,
         password: p,
     };
-    fetch("http://" + parsedUrl.host + ":8001/login", {
+    fetch("http://" + parsedUrl.host + ":8001/login", {  // This is where the current issue is
+        // The two outputs
+        // Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://0.0.0.0:8001/login. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
+        // Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://0.0.0.0:8001/login. (Reason: CORS request did not succeed). Status code: (null).
         method: "POST",
+        mode: "cors",
         headers: {
             "Content-Type": "application/json"
         },
