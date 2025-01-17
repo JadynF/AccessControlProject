@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
+const axios = require('axios');
 
 const PORT = String(process.env.PORT);
 const HOST = String(process.env.HOST);
@@ -22,13 +23,33 @@ let connection = mysql.createConnection({
 app.use("/", express.static("frontend"));
 
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     return res.status(401).send("Access Denied");
   }
+
+  const payload = {
+    token: token
+  };
+
+  try {
+    const response = await axios.post('http://server-users:8001/validateToken', payload);
+
+    console.log(response.data);
+    if (response.status = 200)
+      next();
+    else {
+      return res.status(401).send("Access Denied");
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+
+  // send separate request to the users server
 }
 
 app.get("/query", authenticateToken, function (request, response) {

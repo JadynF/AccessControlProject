@@ -51,8 +51,25 @@ function getTOTP(secret, callback) {
   });
 }
 
+app.post("/validateToken", (req, res) => {
+  console.log("Validating token: ");
+
+  let token = req.body.token;
+
+  console.log(token);
+
+  jwt.verify(token, JWTSECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).send("Invalid Token");
+    }
+    console.log("Decoded token: ");
+    console.log(decoded);
+    res.status(200).send("Token Validated");
+  })
+})
+
 app.post("/totp", (req, res) => {
-  console.log("doing /totp");
+  console.log("Handling /totp");
 
   let totpCode = req.body.totp;
 
@@ -66,9 +83,18 @@ app.post("/totp", (req, res) => {
 
     if (totp == totpCode) {
       let userData = "SELECT * FROM users WHERE username='" + req.body.username +"';";
-      let token = jwt.sign({ userId: userData.username }, JWTSECRET, { expiresIn: '1h' });
-      console.log(token);
-      res.status(200).json({ token });
+      connection.query(userData, [true], (err, results, fields) => {
+        if (err) {
+          console.error("Database Error: \n", err.message);
+          res.status(500).send("Server Error");
+        }
+        else {
+          let token = jwt.sign({ userId: results[0].username }, JWTSECRET, { expiresIn: '1h' });
+          console.log("Token Created: ");
+          console.log(token);
+          res.status(200).json({ token });
+        }
+      })
     }
     else {
       res.status(401).send("Incorrect");
