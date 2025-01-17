@@ -19,8 +19,6 @@ app.use(express.json());
 app.use(cors());
 
 
-
-
 let connection = mysql.createConnection({
   host: MYSQLHOST,
   user: MYSQLUSER,
@@ -54,6 +52,8 @@ function getTOTP(secret, callback) {
 }
 
 app.post("/totp", (req, res) => {
+  console.log("doing /totp");
+
   let totpCode = req.body.totp;
 
   getTOTP(TOTPSECRET, (err, totp) => {
@@ -66,8 +66,9 @@ app.post("/totp", (req, res) => {
 
     if (totp == totpCode) {
       let userData = "SELECT * FROM users WHERE username='" + req.body.username +"';";
-      let token = jwt.sign(userData, JWTSECRET, { expiresIn: "1h" });
-      res.status(200).send(token);
+      let token = jwt.sign({ userId: userData.username }, JWTSECRET, { expiresIn: '1h' });
+      console.log(token);
+      res.status(200).json({ token });
     }
     else {
       res.status(401).send("Incorrect");

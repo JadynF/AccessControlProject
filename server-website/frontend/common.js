@@ -1,9 +1,14 @@
 var parsedUrl = new URL(window.location.href);
 
 function query() {
+    let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
+    console.log(token);
     fetch("http://" + parsedUrl.host + "/query", {
         method: "GET",
         mode: "cors",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
     })
     .then((resp) => resp.text())
     .then((data) => {
@@ -31,31 +36,25 @@ function totp() {
         body: JSON.stringify(payload)
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(response.status);
-        }
-        return response;
+        return response.json();
     })
     .then(data => {
-        if (data.status == 200) {
-            alert("TOTP successful");
-            console.log(data);
-            console.log(data.token);
-            localStorage.set("token", data.token);
-            window.location.href = ("http://" + parsedUrl.host + "/query.html");
-        }
+        alert("TOTP successful");
+        console.log(data);
+        document.cookie = `token=${data.token}`;
+        window.location.href = ("http://" + parsedUrl.host + "/query.html");
     })
-    .catch((err) => {
-        if (err.message == 500) {
-            alert("Server error");
-        }
-        else if (err.message == 401) {
-            alert("Incorrect TOTP");
-        }
-        else {
-            alert("Unknown Error");
-        }
-    });
+    //.catch((err) => {
+    //    if (err.message == 500) {
+    //        alert("Server error");
+    //    }
+    //    else if (err.message == 401) {
+    //        alert("Incorrect TOTP");
+    //    }
+    //    else {
+    //        alert("Unknown Error");
+    //    }
+    //});
 }
 
 function login() {

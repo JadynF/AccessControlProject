@@ -6,7 +6,7 @@ const HOST = String(process.env.HOST);
 const MYSQLHOST = String(process.env.MYSQLHOST);
 const MYSQLUSER = String(process.env.MYSQLUSER);
 const MYSQLPASS = String(process.env.MYSQLPASS);
-const SQL = "SELECT * FROM aliens;"
+const SQL = "SELECT * FROM sightings;"
 
 const app = express();
 app.use(express.json());
@@ -22,7 +22,16 @@ let connection = mysql.createConnection({
 app.use("/", express.static("frontend"));
 
 
-app.get("/query", function (request, response) {
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).send("Access Denied");
+  }
+}
+
+app.get("/query", authenticateToken, function (request, response) {
   connection.query(SQL, [true], (error, results, fields) => {
     if (error) {
       console.error(error.message);
