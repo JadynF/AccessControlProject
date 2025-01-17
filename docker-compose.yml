@@ -20,7 +20,7 @@ services:
     volumes:
       - ./server-users/backend-users:/app/backend
     ports:
-      - "8001:80"
+      - "8001:8001"
   mysql-website:
     image: mysql
     environment:

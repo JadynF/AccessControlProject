@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const JWTSECRET = String(process.env.JWTSECRET);
 const TOTPSECRET = String(process.env.TOTP);
@@ -15,6 +16,7 @@ const MYSQLPASS = String(process.env.MYSQLPASS);
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 
 
@@ -74,10 +76,10 @@ app.post("/totp", (req, res) => {
 })
 
 app.post("/login", function (req, res) {
+  console.log("login");
+
   let username = req.body.username;
   let password = req.body.password;
-  
-  console.log('will this print? (located in backend-user index.js /login to test if its called)')
 
   let SQL = "SELECT * FROM users WHERE username='" + username + "';";
   connection.query(SQL, [true], (err, results, fields) => {
@@ -86,6 +88,7 @@ app.post("/login", function (req, res) {
       res.status(500).send("Server Error");
     }
     else {
+      console.log(results);
       if (results.length == 0) {
         console.log("User not found");
         res.status(401).send("Unauthorized");
@@ -107,7 +110,6 @@ app.post("/login", function (req, res) {
     }
   })
 })
-
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
