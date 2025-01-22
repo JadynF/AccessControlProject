@@ -7,6 +7,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     email    VARCHAR(255) NOT NULL,
     salt     VARCHAR(255) NOT NULL,
+    role     ENUM ('Human', 'Admin', 'Alien') NOT NULL,
     PRIMARY KEY (username)
 );
 
@@ -15,5 +16,6 @@ VALUES(
     "user",
     "$2a$04$4UZJAv.xgdjzdXxrA9MpEO/Wrqj2BErIB9scnXFKtzHCUHVHxorv.",
     "user@example.com",
-    "3eb7"
+    "3eb7",
+    "Human"
 );

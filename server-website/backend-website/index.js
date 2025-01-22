@@ -38,9 +38,10 @@ async function authenticateToken(req, res, next) {
   try {
     const response = await axios.post('http://server-users:8001/validateToken', payload);
 
-    console.log(response.data);
-    if (response.status = 200)
+    if (response.status = 200) {
+      req.userRole = response.data.role;
       next();
+    }
     else {
       return res.status(401).send("Access Denied");
     }
@@ -53,15 +54,21 @@ async function authenticateToken(req, res, next) {
 }
 
 app.get("/query", authenticateToken, function (request, response) {
-  connection.query(SQL, [true], (error, results, fields) => {
-    if (error) {
-      console.error(error.message);
-      response.status(500).send("database error");
-    } else {
-      console.log(results);
-      response.send(results);
-    }
-  });
+  const userRole = request.userRole;
+
+  if (userRole == "Human" || userRole == "Admin" || userRole == "Alien") {
+    connection.query(SQL, [true], (error, results, fields) => {
+      if (error) {
+        console.error(error.message);
+        response.status(500).send("database error");
+      } else {
+        response.send(results);
+      }
+    });
+  }
+  else {
+    response.status(401).send("Access Denied");
+  }
 })
 
 app.listen(PORT, HOST);
