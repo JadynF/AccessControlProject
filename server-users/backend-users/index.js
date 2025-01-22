@@ -62,9 +62,23 @@ app.post("/validateToken", (req, res) => {
     if (err) {
       return res.status(403).send("Invalid Token");
     }
-    console.log("Decoded token: ");
-    console.log(decoded);
-    res.status(200).send("Token Validated");
+
+    let userData = decoded.userData;
+    return res.status(200).json({ 'username': userData.username, 'email': userData.email, 'role': userData.role});
+
+    //let Query = "SELECT role WHERE username = '" + user + "';";
+
+    //connection.query(Query, [true], (err, results, fields) => {
+    //  if (err) {
+    //    console.error("Database Error: \n", err.message);
+    //    res.status(500).send("Server Error");
+    //  }
+    //  else {
+    //    let userRole = results[0].role;
+    //    console.log(userRole);
+    //    res.status(200).json({ userRole });
+    //  }
+    //})
   })
 })
 
@@ -89,7 +103,7 @@ app.post("/totp", (req, res) => {
           res.status(500).send("Server Error");
         }
         else {
-          let token = jwt.sign({ userId: results[0].username }, JWTSECRET, { expiresIn: '1h' });
+          let token = jwt.sign({ userData: results[0] }, JWTSECRET, { expiresIn: '1h' });
           console.log("Token Created: ");
           console.log(token);
           res.status(200).json({ token });
