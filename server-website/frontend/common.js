@@ -1,13 +1,15 @@
 var parsedUrl = new URL(window.location.href);
 
-function query() {
+function query(accessString) {
     let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
-    console.log(token);
+    // console.log(token);
+    // console.log("TEST" + accessString)
     fetch("http://" + parsedUrl.host + "/query", {
         method: "GET",
         mode: "cors",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "entries": `${accessString}`
         }
     })
     .then((resp) => resp.text())

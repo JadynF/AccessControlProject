@@ -7,7 +7,6 @@ const HOST = String(process.env.HOST);
 const MYSQLHOST = String(process.env.MYSQLHOST);
 const MYSQLUSER = String(process.env.MYSQLUSER);
 const MYSQLPASS = String(process.env.MYSQLPASS);
-const SQL = "SELECT * FROM sightings;"
 
 const app = express();
 app.use(express.json());
@@ -55,6 +54,11 @@ async function authenticateToken(req, res, next) {
 
 app.get("/query", authenticateToken, function (request, response) {
   const userRole = request.userRole;
+  const dataLocation = request.headers['entries'];
+
+  // Change the requested table based on the imported data
+  const SQL = `SELECT * FROM ${dataLocation}`
+  console.log(SQL)
 
   if (userRole == "Human" || userRole == "Admin" || userRole == "Alien") {
     connection.query(SQL, [true], (error, results, fields) => {
