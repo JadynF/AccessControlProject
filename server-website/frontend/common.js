@@ -55,10 +55,14 @@ function query(accessString) {
     })
     .then((resp) => resp.text())
     .then((data) => {
-        
-        let formatted = formatData(data, accessString);
-        document.getElementById("test").innerHTML = formatted; 
-        document.getElementById("response").innerHTML = data;
+        if (data == "Access Denied") {
+            document.getElementById("test").innerHTML = "<div>Access Denied</div>";
+        }
+        else {
+            let formatted = formatData(data, accessString);
+            document.getElementById("test").innerHTML = formatted; 
+            document.getElementById("response").innerHTML = data;   
+        }
     })
     .catch((err) => {
         console.log(err);

@@ -64,6 +64,7 @@ app.post("/validateToken", (req, res) => {
     }
 
     let userData = decoded.userData;
+    console.log(userData);
     return res.status(200).json({ 'username': userData.username, 'email': userData.email, 'role': userData.role});
 
     //let Query = "SELECT role WHERE username = '" + user + "';";

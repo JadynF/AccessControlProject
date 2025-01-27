@@ -26,6 +26,8 @@ async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  console.log("Middleware token: " + token);
+
   if (!token) {
     return res.status(401).send("Access Denied");
   }
@@ -36,6 +38,8 @@ async function authenticateToken(req, res, next) {
 
   try {
     const response = await axios.post('http://server-users:8001/validateToken', payload);
+
+    console.log(response.data);
 
     if (response.status = 200) {
       req.userRole = response.data.role;
@@ -56,11 +60,20 @@ app.get("/query", authenticateToken, function (request, response) {
   const userRole = request.userRole;
   const dataLocation = request.headers['entries'];
 
+  let allowedRoles = [];
+
+  if (dataLocation == "alienMessages") {
+    allowedRoles = ["Admin", "Alien"];
+  }
+  else if (dataLocation == "sightings") {
+    allowedRoles = ["Human", "Admin", "Alien"];
+  }
+
   // Change the requested table based on the imported data
   const SQL = `SELECT * FROM ${dataLocation}`
   console.log(SQL)
 
-  if (userRole == "Human" || userRole == "Admin" || userRole == "Alien") {
+  if (allowedRoles.includes(userRole)) {
     connection.query(SQL, [true], (error, results, fields) => {
       if (error) {
         console.error(error.message);
