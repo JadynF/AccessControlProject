@@ -19,3 +19,12 @@ VALUES(
     "3eb7",
     "Human"
 );
+
+INSERT INTO users
+VALUES(
+    "user2",
+    "$2a$12$bNVhN3WlYFKA9vvEXkaP/u2XwrEHPWMjDNLkxtPfrKArwG.z5AqZS",
+    "user2@example.com",
+    "4b7a",
+    "Alien"
+)
