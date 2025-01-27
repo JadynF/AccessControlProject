@@ -1,18 +1,68 @@
 var parsedUrl = new URL(window.location.href);
 
-function query() {
+function formatData(data, table){
+    let jsonData = JSON.parse(data)    
+    
+    if (table == 'sightings'){
+        const alienSighting= jsonData.map(item => `
+             
+            <div>
+                <p><strong>Sighting Number: </strong> ${item.sightingNumber} </p>
+                <p><strong>Sighting Time:</strong> ${item.sightingTime} </p>
+                <p><strong>Ship Shape: ${item.shipShape} </strong></p>
+                <p><strong>Ship Color:</strong> ${item.shipColor} </p> 
+                <p><strong>Ship Description:</strong> ${item.shipDesc} </p> 
+            </div>
+        `);
+        return alienSighting;
+    } else if (table == 'alienMessages') {
+        const alienMessage = jsonData.map(item => `
+            
+            <div style="align-content: center;">
+                <img src="alen.gif" style="width: 100%; height: 100%; border-radius: 8px; align-self: center;"> 
+                <p><strong>Message Number: </strong> ${item.messageNumber} </p>
+                <p><strong>Time:</strong> ${item.messageTime} </p>
+                <p style="background-color: red;"><strong>Message: ${item.messageText} </strong></p>
+                <p><strong>Medium:</strong> ${item.messageMedium} </p> 
+            </div>
+        `);
+        return alienMessage;
+    } else {
+        const fail = `
+            <div>
+                <p><strong>NO DATA FOUND</strong></p>
+            </div>
+        `
+        return fail;
+    }
+     
+    
+
+    
+}
+
+function query(accessString) {
     let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
-    console.log(token);
+    // console.log(token);
+    // console.log("TEST" + accessString)
     fetch("http://" + parsedUrl.host + "/query", {
         method: "GET",
         mode: "cors",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "entries": `${accessString}`
         }
     })
     .then((resp) => resp.text())
     .then((data) => {
-        document.getElementById("response").innerHTML = data;
+        if (data == "Access Denied") {
+            document.getElementById("test").innerHTML = "<div>Access Denied</div>";
+        }
+        else {
+            let formatted = formatData(data, accessString);
+            document.getElementById("test").innerHTML = formatted; 
+            document.getElementById("response").innerHTML = data;   
+        }
     })
     .catch((err) => {
         console.log(err);
