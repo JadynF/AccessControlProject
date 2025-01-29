@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const { v1: uuidv1 } = require('uuid');
 
 const JWTSECRET = String(process.env.JWTSECRET);
 const TOTPSECRET = String(process.env.TOTP);
@@ -50,6 +51,29 @@ function getTOTP(secret, callback) {
     callback(null, totp);
   });
 }
+
+app.post("/log", (req, res) => {
+  let who = req.body.who;
+  let when = req.body.when;
+  let what = req.body.what;
+  let success = req.body.success;
+
+  const uuid = uuidv1();
+  console.log(uuid);
+
+  let query = "INSERT INTO logs VALUES('" + uuid +"', '" + who + "', '" + when + "', '" + what + "', '" + success + "');";
+  console.log(query);
+  
+  connection.query(query, [true], (err, results, fields) => {
+    if (err) {
+      console.error("Database Error: \n", err.message);
+      res.status(500).send("Server Error");
+    }
+    else {
+      res.status(200).json("Success");
+    }
+  });
+})
 
 app.post("/validateToken", (req, res) => {
   console.log("Validating token: ");

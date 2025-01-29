@@ -11,6 +11,15 @@ CREATE TABLE users (
     PRIMARY KEY (username)
 );
 
+CREATE TABLE logs (
+    id       VARCHAR(255) NOT NULL,
+    who VARCHAR(255) NOT NULL,
+    `when`     VARCHAR(255) NOT NULL,
+    what     VARCHAR(1023) NOT NULL,
+    success  VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
 INSERT INTO users
 VALUES(
     "user",

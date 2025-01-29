@@ -35,14 +35,34 @@ function formatData(data, table){
         `
         return fail;
     }
-     
-    
+}
 
-    
+function log(who, what, success) {
+    const when = new Date();
+    let payload = {
+        who: who,
+        what: what,
+        when: when,
+        success: success
+    }
+
+    fetch("http://" + parsedUrl.host + ":8001/log", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        console.log(data);
+    })
 }
 
 function query(accessString) {
     let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
+    let username = localStorage.getItem("username");
     // console.log(token);
     // console.log("TEST" + accessString)
     fetch("http://" + parsedUrl.host + "/query", {
@@ -57,15 +77,17 @@ function query(accessString) {
     .then((data) => {
         if (data == "Access Denied") {
             document.getElementById("test").innerHTML = "<div>Access Denied</div>";
+            log(username, "Queried Data: " + accessString, "Role Denied Access");   
         }
         else {
             let formatted = formatData(data, accessString);
             document.getElementById("test").innerHTML = formatted; 
-            document.getElementById("response").innerHTML = data;   
+            log(username, "Queried Data: " + accessString, "Success");   
         }
     })
     .catch((err) => {
         console.log(err);
+        log(username, "Queried Data: " + accessString, "Failed"); 
     })
 }
 
@@ -89,22 +111,16 @@ function totp() {
         return response.json();
     })
     .then(data => {
+        log(localUsername, "TOTP Authentication", "Success");
         alert("TOTP successful");
         console.log(data);
         document.cookie = `token=${data.token}`;
         window.location.href = ("http://" + parsedUrl.host + "/query.html");
     })
-    //.catch((err) => {
-    //    if (err.message == 500) {
-    //        alert("Server error");
-    //    }
-    //    else if (err.message == 401) {
-    //        alert("Incorrect TOTP");
-    //    }
-    //    else {
-    //        alert("Unknown Error");
-    //    }
-    //});
+    .catch((err) => {
+        console.log(err);
+        log(localUsername, "TOTP Authentication", "Failed");
+    });
 }
 
 function login() {
@@ -133,12 +149,14 @@ function login() {
     })
     .then(data => {
         if (data.status == 200) {
+            log(u, "Log In", "Success");
             alert("Login successful!");
             localStorage.setItem("username", u);
             window.location.href = ("http://" + parsedUrl.host + "/totp.html");
         }
     })
     .catch((err) => {
+        log(u, "Log In", "Failed");
         if (err.message == 500) {
             alert("Server Error");
         }
