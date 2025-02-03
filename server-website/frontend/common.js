@@ -56,7 +56,7 @@ function log(who, what, success) {
     })
     .then((res) => res.json())
     .then((data) => {
-        console.log(data);
+        //console.log(data);
     })
 }
 
@@ -113,7 +113,7 @@ function totp() {
     .then(data => {
         log(localUsername, "TOTP Authentication", "Success");
         alert("TOTP successful");
-        console.log(data);
+        //console.log(data);
         document.cookie = `token=${data.token}`;
         window.location.href = ("http://" + parsedUrl.host + "/query.html");
     })
@@ -123,6 +123,61 @@ function totp() {
     });
 }
 
+function getLog() {
+    let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
+    let username = localStorage.getItem("username");
+    
+    if (!token) {
+        console.error("Missing Token")
+        log(username, "Queried Logs", "Failed"); 
+        return;
+    }
+
+    fetch("http://" + parsedUrl.host + ":8001/queryLog", {
+        mode: "cors",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => {
+        if (!response.ok) {
+            log(username, "Queried Logs:", "Failed"); 
+            throw new Error(data.status);
+        }else{
+            log(username, "Queried Logs:", "Success"); 
+            return response.json();
+        }
+    }).then(data => {
+        // console.log("\n \n \n RESPONSE \n \n \n" + JSON.stringify(data));
+        
+        const logView = document.getElementById('logs');
+        logView.innerHTML = '';
+
+        data.forEach(logReprot => {
+            const entry = document.createElement('div');
+            entry.classList.add('log-entry');
+
+            if (logReprot.success === "Success") {
+                entry.style.backgroundColor = "green";
+            } else {
+                entry.style.backgroundColor = "red";
+            }
+
+            entry.innerHTML = `
+                <p> ID: ${logReprot.id}</p>
+                <p> Time: ${logReprot.when}</p>
+                <p> User: ${logReprot.who}</p>
+                <p> Action: ${logReprot.what}</p>
+                <p> Attempt: ${logReprot.success}</p>`;
+
+            logView.appendChild(entry);
+        });
+
+    }) .catch((err) => {
+        console.log(err);
+        log(username, "Queried Logs", "Failed"); 
+    })
+}
+
 function login() {
     const u = document.getElementById("username").value;
     const p = document.getElementById("password").value;
@@ -130,11 +185,8 @@ function login() {
         username: u,
         password: p,
     };
-    fetch("http://" + parsedUrl.host + ":8001/login", {  // This is where the current issue is
-        // The two outputs
-        // Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://0.0.0.0:8001/login. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-        // Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://0.0.0.0:8001/login. (Reason: CORS request did not succeed). Status code: (null).
-        method: "POST",
+    fetch("http://" + parsedUrl.host + ":8001/login", {
+        method: "POST",  
         mode: "cors",
         headers: {
             "Content-Type": "application/json"

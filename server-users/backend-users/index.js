@@ -19,14 +19,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
 let connection = mysql.createConnection({
   host: MYSQLHOST,
   user: MYSQLUSER,
   password: MYSQLPASS,
   database: "users"
 });
-
 
 function getTOTP(secret, callback) {
   const curr = Math.floor(Date.now() / 1000);
@@ -59,10 +57,10 @@ app.post("/log", (req, res) => {
   let success = req.body.success;
 
   const uuid = uuidv1();
-  console.log(uuid);
+  //console.log(uuid);
 
   let query = "INSERT INTO logs VALUES('" + uuid +"', '" + who + "', '" + when + "', '" + what + "', '" + success + "');";
-  console.log(query);
+  //console.log(query);
   
   connection.query(query, [true], (err, results, fields) => {
     if (err) {
@@ -76,11 +74,11 @@ app.post("/log", (req, res) => {
 })
 
 app.post("/validateToken", (req, res) => {
-  console.log("Validating token: ");
+  // console.log("Validating token: ");
 
   let token = req.body.token;
 
-  console.log(token);
+  // console.log(token);
 
   jwt.verify(token, JWTSECRET, (err, decoded) => {
     if (err) {
@@ -88,7 +86,7 @@ app.post("/validateToken", (req, res) => {
     }
 
     let userData = decoded.userData;
-    console.log(userData);
+    // console.log(userData);
     return res.status(200).json({ 'username': userData.username, 'email': userData.email, 'role': userData.role});
 
     //let Query = "SELECT role WHERE username = '" + user + "';";
@@ -105,6 +103,46 @@ app.post("/validateToken", (req, res) => {
     //  }
     //})
   })
+})
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).send("Access Denied: No Token");
+  }
+  jwt.verify(token, JWTSECRET, (err, decoded) => {
+      if (err) {
+        return res.status(403).send("Invalid Token");
+      }
+
+      req.userRole = decoded.userData.role;
+      console.log(req.userRole)
+      next();
+  });
+};
+
+app.get("/queryLog", authenticateToken, function (request, response) {
+  const userRole = request.userRole;
+  let allowedRoles = ['Admin', 'Alien'];
+
+  const SQL = `SELECT * FROM logs`
+
+  if (allowedRoles.includes(userRole)) {
+    connection.query(SQL, [true], (error, results, fields) => {
+      if (error) {
+        console.error(error.message);
+        response.status(500).send("database error");
+      } else {
+        // console.log(results);
+        return response.status(200).json(results);
+      }
+    });
+  }
+  else {
+    response.status(401).send("Access Denied");
+  }
 })
 
 app.post("/totp", (req, res) => {
@@ -129,8 +167,8 @@ app.post("/totp", (req, res) => {
         }
         else {
           let token = jwt.sign({ userData: results[0] }, JWTSECRET, { expiresIn: '1h' });
-          console.log("Token Created: ");
-          console.log(token);
+          // console.log("Token Created: ");
+          // console.log(token);
           res.status(200).json({ token });
         }
       })
