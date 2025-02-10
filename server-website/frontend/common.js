@@ -249,8 +249,6 @@ function getRandomPosition(max) {
 
 // Function to move the image randomly
 function moveAlen() {
-    console.log("moving image");
-
     const image = document.getElementById("alen");
     const maxX = window.innerWidth - image.width; // maximum horizontal position
     const maxY = window.innerHeight - image.height; // maximum vertical position
@@ -262,5 +260,5 @@ function moveAlen() {
     image.style.top = `${randomY}px`;
 }
 
-// Call the moveImage function every 1 second (1000ms)
-setInterval(moveAlen, 70);
+if (document.getElementById("alen") != "null")
+    setInterval(moveAlen, 70);
