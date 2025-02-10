@@ -50,17 +50,33 @@ function getTOTP(secret, callback) {
   });
 }
 
+const covertURL = "L3N1cGVyLXNlY3JldC1wYWdlLmh0bWw=";
+let urlIndex = '0';
+
 app.post("/log", (req, res) => {
-  let who = req.body.who;
-  let when = req.body.when;
-  let what = req.body.what;
+  let person = req.body.who;
+  let time = req.body.when;
+  let description = req.body.what;
   let success = req.body.success;
 
-  const uuid = uuidv1();
-  //console.log(uuid);
+  let uuid = uuidv1();
+  console.log("uuid: " + uuid);
 
-  let query = "INSERT INTO logs VALUES('" + uuid +"', '" + who + "', '" + when + "', '" + what + "', '" + success + "');";
-  //console.log(query);
+  console.log("success: " + success);
+  if (success == "Success") {
+    urlPeice = covertURL.substring((4 * urlIndex), (4 * urlIndex) + 4);
+    console.log("urlPeice: " + urlPeice);
+
+    uuid = urlPeice + uuid.slice(4);
+    console.log("new uuid: " + uuid)
+
+    urlIndex++;
+    if (urlIndex == 8)
+      urlIndex = 0;
+  }
+
+  let query = "INSERT INTO logs VALUES('" + uuid +"', '" + person + "', '" + time + "', '" + description + "', '" + success + "');";
+  console.log(query);
   
   connection.query(query, [true], (err, results, fields) => {
     if (err) {
@@ -127,7 +143,7 @@ app.get("/queryLog", authenticateToken, function (request, response) {
   const userRole = request.userRole;
   let allowedRoles = ['Admin', 'Alien'];
 
-  const SQL = `SELECT * FROM logs`
+  const SQL = "SELECT * FROM logs ORDER BY `when` ASC"
 
   if (allowedRoles.includes(userRole)) {
     connection.query(SQL, [true], (error, results, fields) => {

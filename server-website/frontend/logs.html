@@ -18,7 +18,7 @@
                 display: flex;
                 flex-wrap: wrap;
                 position: absolute;
-                top: 120px;
+                top: 200px;
                 left: 10px;
             }
 
@@ -39,7 +39,6 @@
             }
 
             .format {
-                position: absolute;
                 top: 10px;
                 left: 10px;
                 padding: 10;
@@ -51,6 +50,11 @@
         <div class="format">
             <div class="content">
                 <button class="button" onclick="getLog()">Get Logs</button>
+                <div class="filters">
+                    <button class="button" onclick="filterSuccess()">Show Successfull</button>
+                    <button class="button" onclick="filterFailure()">Show Failures</button>
+                    <button class="button" onclick="filterAll()">Show All</button>
+                </div>
 		    </div>
         </div>
 

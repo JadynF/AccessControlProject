@@ -123,6 +123,8 @@ function totp() {
     });
 }
 
+let logData = '';
+
 function getLog() {
     let token = document.cookie.match(new RegExp('(^| )token=([^;]+)'))[2];
     let username = localStorage.getItem("username");
@@ -148,34 +150,53 @@ function getLog() {
         }
     }).then(data => {
         // console.log("\n \n \n RESPONSE \n \n \n" + JSON.stringify(data));
-        
-        const logView = document.getElementById('logs');
-        logView.innerHTML = '';
-
-        data.forEach(logReprot => {
-            const entry = document.createElement('div');
-            entry.classList.add('log-entry');
-
-            if (logReprot.success === "Success") {
-                entry.style.backgroundColor = "green";
-            } else {
-                entry.style.backgroundColor = "red";
-            }
-
-            entry.innerHTML = `
-                <p> ID: ${logReprot.id}</p>
-                <p> Time: ${logReprot.when}</p>
-                <p> User: ${logReprot.who}</p>
-                <p> Action: ${logReprot.what}</p>
-                <p> Attempt: ${logReprot.success}</p>`;
-
-            logView.appendChild(entry);
-        });
+        logData = data;
+        filterAll();
 
     }) .catch((err) => {
         console.log(err);
         log(username, "Queried Logs", "Failed"); 
     })
+}
+
+function filterSuccess() {
+    let data = logData.filter(logData => logData.success == "Success");
+
+    displayLogData(data);
+}
+
+function filterFailure() {
+    let data = logData.filter(logData => logData.success != "Success");
+
+    displayLogData(data);
+}
+
+function filterAll() {
+    displayLogData(logData);
+}
+
+function displayLogData(data) {
+    const logView = document.getElementById('logs');
+    logView.innerHTML = '';
+    data.forEach(logReprot => {
+        const entry = document.createElement('div');
+        entry.classList.add('log-entry');
+
+        if (logReprot.success === "Success") {
+            entry.style.backgroundColor = "green";
+        } else {
+            entry.style.backgroundColor = "red";
+        }
+
+        entry.innerHTML = `
+            <p> Time: ${logReprot.when}</p>
+            <p> ID: ${logReprot.id}</p>
+            <p> User: ${logReprot.who}</p>
+            <p> Action: ${logReprot.what}</p>
+            <p> Attempt: ${logReprot.success}</p>`;
+
+        logView.appendChild(entry);
+    });
 }
 
 function login() {
@@ -220,3 +241,26 @@ function login() {
         }
     });
 }
+
+// Function to get a random number within a range
+function getRandomPosition(max) {
+    return Math.floor(Math.random() * max);
+}
+
+// Function to move the image randomly
+function moveAlen() {
+    console.log("moving image");
+
+    const image = document.getElementById("alen");
+    const maxX = window.innerWidth - image.width; // maximum horizontal position
+    const maxY = window.innerHeight - image.height; // maximum vertical position
+
+    const randomX = getRandomPosition(maxX);
+    const randomY = getRandomPosition(maxY);
+
+    image.style.left = `${randomX}px`;
+    image.style.top = `${randomY}px`;
+}
+
+// Call the moveImage function every 1 second (1000ms)
+setInterval(moveAlen, 70);
