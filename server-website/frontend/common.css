@@ -123,7 +123,7 @@ body {
     position: absolute;
     left: -4%;
     top: 20%;
-    animation: alen6 3s ease-in-out infinite;
+    animation: alen6 5s ease-in-out infinite;
 }
 
 @keyframes alen6 {
@@ -209,5 +209,130 @@ body {
     }
     100% {
         color: red;
+    }
+}
+
+#ufo {
+    position: absolute;
+    top:0;
+    left:0;
+    animation: ufoAnimation 0.5s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufoAnimation {
+    0% {
+        left: 70%;
+        top: 0%
+    }
+    100% {
+        left: 0%;
+        top: 100%;
+    }
+}
+#ufo2 {
+    position: absolute;
+    top:0;
+    left:0;
+    animation: ufo2Animation 0.2s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo2Animation {
+    0% {
+        left: 0%;
+        top: 20%
+    }
+    100% {
+        left: 100%;
+        top: 80%;
+    }
+}
+#ufo3 {
+    position: absolute;
+    top:0;
+    left:0;
+    animation: ufo3Animation 0.7s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo3Animation {
+    0% {
+        left: 10%;
+        top: 0%
+    }
+    100% {
+        left: 30%;
+        top: 100%;
+    }
+}
+#ufo4 {
+    position: absolute;
+    top:0;
+    left:0;
+    animation: ufo4Animation 0.8s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo4Animation {
+    0% {
+        left: 0%;
+        top: 70%
+    }
+    100% {
+        left: 100%;
+        top: 20%;
+    }
+}
+#ufo5 {
+    position: absolute;
+    top:0;
+    left:0;
+    animation: ufo5Animation 1 linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo5Animation {
+    0% {
+        left: 70%;
+        top: 0%
+    }
+    100% {
+        left: 0%;
+        top: 100%;
+    }
+}
+
+#ufo5 {
+    position: absolute;
+    top:5%;
+    left:85%;
+    animation: ufo5Animation 0.2s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo5Animation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#ufo6 {
+    position: absolute;
+    top:5%;
+    left:5%;
+    animation: ufo6Animation 0.01s linear infinite;
+    width: 200px;
+}
+
+@keyframes ufo6Animation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
