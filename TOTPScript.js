@@ -10,11 +10,9 @@ bcrypt.hash(TOTPSECRET + timestamp, fixedSalt, (err, rawHash) => {
     console.error(err);
     return;
   }
-
-  console.log(rawHash);
   
   let totp = "";
-  for (let i = 0; i < rawHash.length; i++) {
+  for (let i = rawHash.length - 1; i > 0; i--) {
     if (rawHash.charAt(i) >= '0' && rawHash.charAt(i) <= '9') {
       totp += rawHash.charAt(i);
     }
@@ -22,5 +20,5 @@ bcrypt.hash(TOTPSECRET + timestamp, fixedSalt, (err, rawHash) => {
       break;
     }
   }
-  console.log(totp);
+  console.log("Your TOTP code: " + totp);
 });

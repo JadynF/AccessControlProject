@@ -6,7 +6,7 @@ const cors = require("cors");
 const { v1: uuidv1 } = require('uuid');
 
 const JWTSECRET = String(process.env.JWTSECRET);
-const TOTPSECRET = String(process.env.TOTP);
+const TOTPSECRET = String(process.env.TOTPSECRET);
 const fixedSalt = '$2a$10$wWJq4d32y7bYidLZmCErQ.OgOJL6TqZ8KDRSHoGG0TldwGWzO9Qde';
 const PEPPER = String(process.env.PEPPER);
 const PORT = String(process.env.PORT);
@@ -34,9 +34,8 @@ function getTOTP(secret, callback) {
     if (err) {
       return callback(err);
     }
-    
     let totp = "";
-    for (let i = 0; i < rawHash.length; i++) {
+    for (let i = rawHash.length - 1; i > 0; i--) {
       if (rawHash.charAt(i) >= '0' && rawHash.charAt(i) <= '9') {
         totp += rawHash.charAt(i);
       }
@@ -172,7 +171,7 @@ app.post("/totp", (req, res) => {
       return res.status(500).send("Server Error");
     }
 
-    console.log(totp + " second");
+    console.log("CURRENT TOTP CODE: " + totp);
 
     if (totp == totpCode) {
       let userData = "SELECT * FROM users WHERE username='" + req.body.username +"';";
